@@ -1,6 +1,10 @@
 # 🛠️ Camada de Staging & Ingestão Incremental (Nível 01)
 Nesta etapa, implementei um pipeline de dados robusto que realiza a transição dos dados da camada Raw (CSV) para a camada Staging (PostgreSQL/Parquet), focando em eficiência operacional e integridade dos dados.
 
+## 🏗️ Arquitetura Nível 1
+
+<img width="1609" height="872" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-01/arquitetura-nv1.png" /> 
+
 ---
 
 ## 🚀 Diferenciais Técnicos
