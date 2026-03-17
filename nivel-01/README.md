@@ -1,5 +1,5 @@
 # 🛠️ Camada de Staging & Ingestão Incremental (Nível 01)
-Nesta etapa, implementei um pipeline de dados robusto que realiza a transição dos dados da camada Raw (CSV) para a camada Staging (PostgreSQL/Parquet), focando em eficiência operacional e integridade dos dados.
+Nesta etapa, implementei um pipeline de dados robusto que realiza a transição dos dados da camada Raw (CSV) para a camada Staging (PostgreSQL/Parquet) e, finalmente, para a Camada de Marts (Star Schema). O foco evoluiu da simples ingestão para a entrega de um modelo pronto para análise, priorizando eficiência operacional, integridade e performance analítica.
 
 ---
 
@@ -12,6 +12,12 @@ Nesta etapa, implementei um pipeline de dados robusto que realiza a transição 
 
 ---
 
+## 🏗️ Arquitetura
+
+<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-01/arquitetura-nv1.png" />
+
+---
+
 ## 📊 Estratégia de Carga
 | Carga         | Frequência | Descrição                                                                      |
 |---------------|------------|--------------------------------------------------------------------------------|
@@ -21,28 +27,20 @@ Nesta etapa, implementei um pipeline de dados robusto que realiza a transição 
 ---
 
 ## 🏛️ Camada de Marts (Modelagem Dimensional)
-Após a ingestão na Staging, os dados são transformados e organizados seguindo a metodologia Star Schema (Kimball). Esta camada é otimizada para performance analítica e facilidade de uso por ferramentas de visualização (BI).
+Após a ingestão na Staging, os dados são transformados e organizados seguindo a metodologia Star Schema (Kimball). Esta camada é o "coração" do Business Intelligence, garantindo que o Power BI consuma dados limpos e performáticos.
 
 ---
 
-### 🧠 Arquitetura de Dados
-O modelo foi desenhado para separar entidades descritivas de eventos quantitativos:
+## 🧠 Arquitetura de Dados
+O modelo foi desenhado para separar entidades descritivas de eventos quantitativos, garantindo escalabilidade:
 
-**1. Dimensões Globais (Conformadas):** * dim_produtos: Cadastro central de produtos com atributos de negócio (nome, cor, custo).
-- **dim_calendario:** Tabela de tempo inteligente que permite análises por Ano, Mês, Trimestre e Dia da Semana.
-- **Por que:** São tabelas "âncoras" que podem ser reutilizadas por qualquer outra área da empresa (como Estoque ou Compras).
-
-**2. Tabela Fato:**
-- **fct_vendas:** O coração do Mart. Contém as chaves para as dimensões e as métricas de performance (quantidade, preço unitário, total da linha).
-- **Por que:** Focada na granularidade do item do pedido para garantir somas precisas sem duplicação de valores.
-
-A grande magia dessa abordagem é que você consegue responder perguntas que cruzam os dois mundos usando a Dimensão Global como ponte.
-- Exemplo de consulta:
-  - "Qual a cobertura de estoque? (Quantos dias o meu estoque atual dura baseado na média de vendas?)"
+- Tabela Fato (`fct_vendas`): Consolida os eventos de venda com granularidade ao nível de item. Contém as métricas quantitativas (Quantidade, Valor) e as Surrogate Keys para conexão com as dimensões.
+- Dimensões Conformadas (`dim_produtos`, `dim_calendario`): Funcionam como "âncoras" de negócio.
+  - Por que: Permitem que qualquer nova tabela fato adicionada ao projeto (ex: Estoque) utilize as mesmas dimensões, garantindo uma única versão da verdade (Bus Architecture).
 
 ---
 
-### 💎 Diferenciais da Modelagem
+## 💎 Diferenciais da Modelagem
 - **Chaves de Performance (Surrogate Keys):** Uso de chaves numéricas inteiras (data_sk no formato YYYYMMDD) para garantir que os JOINs sejam executados na velocidade máxima do banco de dados.
 - **Localidade e Padronização:** Tratamento de strings com TMMonth para garantir nomes de meses limpos e em português, prontos para filtros de dashboard.
 - **Escalabilidade (Bus Architecture):** O modelo está preparado para o crescimento. Se novos processos de negócio forem adicionados (ex: Estoque), eles compartilharão as mesmas dimensões globais já existentes.
@@ -55,3 +53,14 @@ A grande magia dessa abordagem é que você consegue responder perguntas que cru
 | `fct_vendas`     | Fato          | Métricas de vendas e chaves de ligação.            |
 | `dim_produtos`   | Dimensão      | Detalhes técnicos e comerciais dos produtos.       |
 | `dim_calendario` | Dimensão      | Inteligência de tempo para agrupamentos temporais. |
+
+---
+
+## 📊 Analytics: A Ponta do Iceberg
+Com a Marts estruturada, o Power BI deixa de fazer "limpeza de dados" e foca em Visualização e DAX. O resultado é um dashboard extremamente rápido e confiável, focado em:
+
+- Rentabilidade: Análise de Custo vs. Faturamento por produto.
+- Sazonalidade: Identificação de picos de venda por dia da semana e meses.
+- Performance: KPIs de crescimento mensal (MoM%) e Rankings de Top Produtos.
+
+---
