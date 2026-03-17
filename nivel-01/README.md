@@ -62,5 +62,3 @@ Com a Marts estruturada, o Power BI deixa de fazer "limpeza de dados" e foca em 
 - Rentabilidade: Análise de Custo vs. Faturamento por produto.
 - Sazonalidade: Identificação de picos de venda por dia da semana e meses.
 - Performance: KPIs de crescimento mensal (MoM%) e Rankings de Top Produtos.
-
----
