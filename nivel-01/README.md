@@ -3,13 +3,13 @@ Nesta etapa, implementei um pipeline de dados robusto que realiza a transição 
 
 ---
 
-## 🏗️ Arquitetura
+## 🏗️ Arquitetura do Projeto
 
 <img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-01/arquitetura-nv1.png" />
 
 ---
 
-## 🚀 Diferenciais Técnicos
+## 🚀 Diferenciais Estratégicos
 - **Idempotência Garantida:** O script foi projetado para ser executado múltiplas vezes sem causar efeitos colaterais. Antes de cada inserção, o sistema limpa a "janela" correspondente no banco de dados, garantindo que não existam registros duplicados, independentemente de quantas vezes o pipeline for acionado.
 - **Janela Incremental (Delta Load):** Em vez de processar toda a base histórica (Full Load), o pipeline trafega apenas os últimos 60 dias de dados. Isso reduz drasticamente o uso de rede e o estresse no banco de dados, otimizando a performance.
 - **Sincronização de Alterações (CDC Manual):** Se um registro de 15 dias atrás for modificado na origem, essa alteração será refletida automaticamente no Data Warehouse. O processo deleta a versão obsoleta e insere a versão mais recente contida no arquivo.
