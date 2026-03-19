@@ -1,0 +1,18 @@
+services:
+  etl_process:
+    build: .
+    container_name: python_etl
+    restart: on-failure
+    env_file:
+      - ../../.env
+    environment:
+      - DB_HOST=postgres
+    volumes:
+      - .:/app
+      - ../../data:/app/data
+    networks:
+      - monitor-net
+
+networks:
+  monitor-net:
+    external: true
