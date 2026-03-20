@@ -8,6 +8,10 @@ from sqlalchemy import text
 load_dotenv()
 
 def get_engine():
+    """
+    Cria a conexão com o banco e tenta reconectar até 5 vezes 
+    caso o banco ainda esteja inicializando.
+    """
     url = URL.create(
         drivername="postgresql+psycopg2",
         username=os.getenv("DB_USER"),
@@ -22,7 +26,7 @@ def get_engine():
     max_retries = 5
     retry_interval = 5
 
-    print(f"📡 Tentando conectar ao banco em {os.getenv('DB_HOST')}...")
+    print(f"Tentando conectar ao banco em {os.getenv('DB_HOST')}...")
 
     for i in range(max_retries):
         try:
@@ -31,8 +35,8 @@ def get_engine():
             print("✅ Banco de dados pronto para receber conexões!")
             return engine
         except Exception as e:
-            print(f"⏳ Banco ainda não disponível (Tentativa {i+1}/{max_retries}). Aguardando {retry_interval}s...")
+            print(f"Banco ainda não disponível (Tentativa {i+1}/{max_retries}). Aguardando {retry_interval}s...")
             print(f'Error: {e}')
             time.sleep(retry_interval)
             
-    raise Exception("❌ Erro: Não foi possível conectar ao banco de dados após várias tentativas.")
+    raise Exception("Erro: Não foi possível conectar ao banco de dados após várias tentativas.")

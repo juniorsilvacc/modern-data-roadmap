@@ -1,16 +1,13 @@
-from src.database import get_engine
-from src.transform import run_etl_process
-from src.marts import create_marts
+from src.extract.file_sales import process_sales_csv
+from src.extract.api_crypto import extract_crypto_to_staging
 
 if __name__ == "__main__":
     print("🚀 Iniciando Pipeline: CSV -> Parquet -> Postgres")
     
     try:
-        engine = get_engine()
-
-        run_etl_process()
+        process_sales_csv()
         
-        create_marts(engine)
+        extract_crypto_to_staging()
         
         print("\n✅ Pipeline finalizado com sucesso!")
     except Exception as e:

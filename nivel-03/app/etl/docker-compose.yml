@@ -8,8 +8,8 @@ services:
     environment:
       - DB_HOST=postgres
     volumes:
-      - .:/app
-      - ../../data:/app/data
+      - ../..:/app
+      
     networks:
       - monitor-net
 
