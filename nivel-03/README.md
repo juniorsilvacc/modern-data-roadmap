@@ -11,7 +11,7 @@
 ## 🚀Diferenciais Estratégicos
 
 ## Guia de Execução - Modern Data Roadmap (Nível 03)
-Siga esta ordem rigorosa para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
+Siga esta **`ordem rigorosa`** para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
 
 ### 1️⃣ Preparação da Rede e Infra
 A rede monitor-net é a ponte entre todos os containers. Sem ela, o Airflow não enxerga o Postgres.
@@ -63,6 +63,8 @@ Fundamental para evitar o erro Permission Denied que tivemos nos arquivos Parque
 sudo chmod -R 777 data/ logs/ dags/
 ```
 
-### Nevegação Airflow
-- Abra o navegador em: http://localhost:8080
-- Use o login admin e senha admin.
+### 5️⃣ Nevegaçções
+- Abra o navegador em:
+    - http://localhost:8080 (Airflow - Orquestração)
+    - http://localhost:3000 (Grafana - Monitoramento)
+- Use o login `admin` e senha `admin` para entrar no dashboard do Airflow e Grafana.
