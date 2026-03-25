@@ -12,10 +12,12 @@ def get_engine():
     Cria a conexão com o banco e tenta reconectar até 5 vezes 
     caso o banco ainda esteja inicializando.
     """
+    db_password = os.getenv("DB_PASS") or os.getenv("DB_PASSWORD")
+    
     url = URL.create(
         drivername="postgresql+psycopg2",
         username=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
+        password=db_password,
         host=os.getenv("DB_HOST"),
         port=os.getenv("DB_PORT"),
         database=os.getenv("DB_NAME")

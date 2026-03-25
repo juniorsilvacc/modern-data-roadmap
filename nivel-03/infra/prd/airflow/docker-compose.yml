@@ -1,0 +1,139 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: airflow_mysql
+    networks:
+      - monitor-net
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: airflow
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow
+      MYSQL_INITDB_SKIP_TZINFO: 1
+      TZ: UTC
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --default-authentication-plugin=mysql_native_password 
+      --character-set-server=utf8mb4 
+      --collation-server=utf8mb4_unicode_ci 
+      --sql-mode="STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -proot | grep 'mysqld is alive'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  webserver:
+    user: "${AIRFLOW_UID:-50000}:0"
+    build:
+      context: .
+    container_name: airflow_webserver
+    restart: always
+    depends_on:
+      - mysql
+    networks:
+      - monitor-net
+    env_file:
+      - ../../../.env
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__EXECUTOR: 'LocalExecutor'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'mysql+mysqldb://airflow:airflow@mysql/airflow'
+      #PYTHONPATH: '/opt/airflow'
+      PYTHONPATH: '/opt/airflow:/opt/airflow/app/etl'
+      _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
+      TZ: UTC
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASS} 
+      DB_PASS: ${DB_PASS}  
+      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${PWD}/../../../dags:/opt/airflow/dags
+      - ${PWD}/../../../logs:/opt/airflow/logs
+      - ${PWD}/../../../plugins:/opt/airflow/plugins
+      - ${PWD}/../../../app:/opt/airflow/app
+      - ${PWD}/../../../data:/opt/airflow/data
+      - ${PWD}/../../../dbt:/opt/airflow/dbt
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+    command: webserver
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  scheduler:
+    user: "${AIRFLOW_UID:-50000}:0"
+    build:
+      context: .
+    container_name: airflow_scheduler
+    restart: always
+    depends_on:
+      - mysql
+    networks:
+      - monitor-net
+    env_file:
+      - ../../../.env
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__EXECUTOR: 'LocalExecutor'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'mysql+mysqldb://airflow:airflow@mysql/airflow'
+      #PYTHONPATH: '/opt/airflow'
+      PYTHONPATH: '/opt/airflow:/opt/airflow/app/etl'
+      _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
+      TZ: UTC
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASS} 
+      DB_PASS: ${DB_PASS}  
+      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      - ${PWD}/../../../dags:/opt/airflow/dags
+      - ${PWD}/../../../logs:/opt/airflow/logs
+      - ${PWD}/../../../plugins:/opt/airflow/plugins
+      - ${PWD}/../../../app:/opt/airflow/app
+      - ${PWD}/../../../data:/opt/airflow/data
+      - ${PWD}/../../../dbt:/opt/airflow/dbt
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: scheduler
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8793/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  monitor-net:
+    external: true
+
+volumes:
+  mysql_data:
