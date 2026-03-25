@@ -10,33 +10,41 @@
 
 ## 🚀Diferenciais Estratégicos
 
-## Execução (Monitoramento + Postgres + ETL)
+## Guia de Execução - Modern Data Roadmap (Nível 03)
+Siga esta ordem rigorosa para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
+
+### 1️⃣ Preparação da Rede e Infra
+A rede monitor-net é a ponte entre todos os containers. Sem ela, o Airflow não enxerga o Postgres.
 ```bash
-# Cria a rede para conectar os containers
+# Cria a rede global (se não existir)
 docker network create monitor-net
 
-# Rodar o container de monitoramento
+# Sobe a stack de Monitoramento (Grafana/Prometheus)
 cd ~/modern-data-roadmap/nivel-03/infra/prd/monitoring && docker compose up -d
-
-# Rodar o container Postgres apontando para o .env na raiz do projeto
-cd ~/modern-data-roadmap/nivel-03/infra/prd/postgres && docker compose --env-file ../../../.env up -d
-
-# Rodar o container ETL apontando para o .env na raiz do projeto
-cd ~/modern-data-roadmap/nivel-03/app/etl && docker compose --env-file ../../.env up -d --build
 ```
 
-## Subir o Airflow
+### 2️⃣ Camada de Dados (PostgreSQL)
+O Postgres deve subir agora para que o banco modern-data-etl-db-nv3 esteja disponível.
 ```bash
-# Suba APENAS o banco de dados primeiro
-docker-compose up -d mysql
+# Sobe o container do banco de dados (PostgreSQL) apontando para o .env na raiz do projeto
+cd ~/modern-data-roadmap/nivel-03/infra/prd/postgres
+docker compose --env-file ../../../.env up -d
+```
 
-# Aguarde uns 15 segundos para o MySQL terminar de inicializar internamente.
+### 3️⃣ Camada de Orquestração (Airflow)
+O Airflow depende do MySQL (metadados) e precisa ler o .env da raiz para as credenciais do ETL.
+```bash
+cd ~/modern-data-roadmap/nivel-03/infra/prd/airflow
 
+# 1. Sobe o banco de metadados e inicializa o Airflow
+docker compose up -d mysql
+# Aguarda o MySQL inicializar
+sleep 15
 # Agora que o MySQL está de pé, rode este comando para criar as tabelas do Airflow
-docker-compose run --rm webserver airflow db init
+docker compose run --rm webserver airflow db init
 
-# Crie seu usuário de acesso
-docker-compose run --rm webserver airflow users create \
+# 2. Cria o usuário Admin
+docker compose run --rm webserver airflow users create \
     --username admin \
     --password admin \
     --firstname Admin \
@@ -44,15 +52,17 @@ docker-compose run --rm webserver airflow users create \
     --role Admin \
     --email admin@example.com
 
-# Reinicie os containers para forçar a leitura do .env da raiz
-docker-compose --env-file ../../../.env up -d --force-recreate
-
-# Agora sim, suba o Airflow completo
-docker-compose up -d
-
-# Da permissão nas pastas do Airflow
-sudo chmod -R 777 ./dags ./logs ./plugins
-
-#Abra o navegador em: http://localhost:8080
-#Use o login admin e senha admin.
+# 3. Sobe o Airflow completo lendo o .env da raiz
+docker compose --env-file ../../../.env up -d --force-recreate
 ```
+
+### 4️⃣ Ajustes de Permissão (WSL/Linux)
+Fundamental para evitar o erro Permission Denied que tivemos nos arquivos Parquet e logs.
+```bash
+# Na raiz do projeto
+sudo chmod -R 777 data/ logs/ dags/
+```
+
+### Nevegação Airflow
+- Abra o navegador em: http://localhost:8080
+- Use o login admin e senha admin.
