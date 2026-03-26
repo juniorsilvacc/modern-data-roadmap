@@ -10,7 +10,7 @@
 
 ## 🚀Diferenciais Estratégicos
 
-## Guia de Execução - Modern Data Roadmap (Nível 03)
+## 🏗️ Guia de Execução - Modern Data Roadmap (Nível 03)
 Siga esta **`ordem rigorosa`** para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
 
 ### 1️⃣ Preparação da Rede e Infra
@@ -68,3 +68,43 @@ sudo chmod -R 777 data/ logs/ dags/
     - http://localhost:8080 (Airflow - Orquestração)
     - http://localhost:3000 (Grafana - Monitoramento)
 - Use o login `admin` e senha `admin` para entrar no dashboard do Airflow e Grafana.
+
+## 🏗️ Guia de Execução: dbt Analytics Engineering
+
+### 1️⃣ Preparação do Ambiente (Local/WSL)
+Antes de rodar o dbt, você precisa garantir que o banco de dados está de pé e que as variáveis de ambiente estão carregadas corretamente para o contexto local.
+```bash
+# 1. Entre na pasta do projeto dbt
+cd ~/modern-data-roadmap/nivel-03/dbt_dw
+
+# 2. Ative o ambiente virtual
+source ../venv/bin/activate
+
+# 3. Carregue o .env da raiz e ajuste para o contexto LOCAL (WSL -> Docker)
+export $(grep -v '^#' ../.env | xargs)
+export DB_HOST=localhost
+export DB_PORT=5433
+```
+
+### 2️⃣ Validando a Conexão
+Sempre rode o `debug` para garantir que o dbt está enxergando o Postgres através da porta mapeada.
+```bash
+dbt debug --profiles-dir .
+```
+
+## ⚙️ Comandos Principais de Modelagem
+
+| Comandos             | Descrição                                                       |
+|--------------------- |-----------------------------------------------------------------|
+| `dbt deps`           | Instala pacotes extras (se houver o arquivo `packages.yml`).    |
+| `dbt seed`           | Carrega arquivos CSV da pasta `seeds/` para o banco.            |
+| `dbt run`            | Executa todos os modelos SQL e cria as tabelas no Postgres.     |
+| `dbt test`           | Roda os testes de qualidade (Unique, Not Null, etc).            |
+| `dbt docs generate`  | Gera a documentação e a linhagem dos dados.                     |
+| `dbt docs serve`     | Abre o portal de documentação no navegador.                     |
+
+## 📂 Estrutura de Camadas (Medallion)
+Para manter a Governança que discutimos, organize seus modelos assim:
+1.`models/staging/`: Camada Bronze. Apenas limpeza básica (renomear colunas, cast de tipos).
+2.`models/intermediate/`: Camada Silver. Joins complexos e regras de negócio entre tabelas.
+3.`models/marts/`: Camada Gold. Tabelas agregadas prontas para o Dashboard (ex: `fct_vendas_crypto`).

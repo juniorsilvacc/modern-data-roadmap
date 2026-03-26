@@ -1,0 +1,12 @@
+dbt_dw:
+  outputs:
+    dev:
+      type: postgres
+      dbname: "{{ env_var('DB_NAME') }}"
+      host: "{{ env_var('DB_HOST') }}"
+      pass: "{{ env_var('DB_PASS') }}"
+      user: "{{ env_var('DB_USER') }}"
+      port: "{{ env_var('DB_PORT') | as_number }}" 
+      schema: public
+      threads: 4
+  target: dev
