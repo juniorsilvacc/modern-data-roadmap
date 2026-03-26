@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: "modern-data-etl-db-nv3"
+    schema: public
+    tables:
+      - name: stg_cryto
+      - name: stg_prduct
+      - name: stg_salesorderdetail
+      - name: stg_salesorderheader

@@ -55,7 +55,8 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'mysql+mysqldb://airflow:airflow@mysql/airflow'
       #PYTHONPATH: '/opt/airflow'
       PYTHONPATH: '/opt/airflow:/opt/airflow/app/etl'
-      _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
+      #_PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
+      _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary dbt-postgres astronomer-cosmos"
       TZ: UTC
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASS} 
@@ -64,6 +65,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
     volumes:
+      - ${PWD}/../../../dbt_dw:/opt/airflow/dbt_dw
       - ${PWD}/../../../dags:/opt/airflow/dags
       - ${PWD}/../../../logs:/opt/airflow/logs
       - ${PWD}/../../../plugins:/opt/airflow/plugins
@@ -103,7 +105,8 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: 'mysql+mysqldb://airflow:airflow@mysql/airflow'
       #PYTHONPATH: '/opt/airflow'
       PYTHONPATH: '/opt/airflow:/opt/airflow/app/etl'
-      _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
+      #_PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
+      _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary dbt-postgres astronomer-cosmos"
       TZ: UTC
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASS} 
@@ -112,6 +115,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
     volumes:
+      - ${PWD}/../../../dbt_dw:/opt/airflow/dbt_dw
       - ${PWD}/../../../dags:/opt/airflow/dags
       - ${PWD}/../../../logs:/opt/airflow/logs
       - ${PWD}/../../../plugins:/opt/airflow/plugins
