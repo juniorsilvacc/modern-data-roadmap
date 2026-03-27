@@ -2,10 +2,21 @@ with source as (
     select * from {{ source('dbt_dw', 'raw_crypto') }}
 ),
 
--- Limpeza técnica e Deduplicação
+-- Identificar e numerar as duplicatas
+deduplicated as (
+    select 
+        *,
+        row_number() over (
+            partition by id -- Agrupa
+            order by extracted_at desc -- Ordena da mais recente para a mais antiga
+        ) as row_num
+    from source
+),
+
+-- Filtrar apenas a linha 1 (a mais recente) e limpar
 cleaned as (
-    select distinct * from source
-    where id is not null
+    select * from deduplicated
+    where row_num = 1
 ),
 
 -- Transformação, Tipagem e Renomeação

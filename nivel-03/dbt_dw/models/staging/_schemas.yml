@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  # --- TABELA DE PRODUTOS ---
+  - name: stg_product
+    description: "Tabela dimensional de produtos limpa e padronizada."
+    columns:
+      - name: id_produto
+        description: "Chave primária do produto."
+        tests:
+          - unique
+          - not_null
+
+  # --- CABEÇALHO DE VENDAS ---
+  - name: stg_salesorderheader
+    description: "Dados mestre de vendas (cabeçalho) com totais e datas."
+    columns:
+      - name: id_pedido
+        description: "Chave primária do pedido de venda."
+        tests:
+          - unique
+          - not_null
+      - name: id_cliente
+        description: "Chave estrangeira para a tabela de clientes."
+        tests:
+          - not_null
+
+  # --- DETALHES DAS VENDAS ---
+  - name: stg_salesorderdetail
+    description: "Itens detalhados de cada pedido de venda."
+    columns:
+      - name: id_detalhe_pedido
+        description: "Chave primária da linha do item do pedido."
+        tests:
+          - unique
+          - not_null
+      - name: id_pedido
+        description: "Chave estrangeira ligando ao cabeçalho da venda."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_salesorderheader')
+              field: id_pedido
+      - name: id_produto
+        description: "Chave estrangeira do produto vendido."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_product')
+              field: id_produto
+
+  # --- CRIPTOMOEDAS ---
+  - name: stg_crypto
+    description: "Dados de mercado de criptomoedas extraídos da API."
+    columns:
+      - name: id_crypto
+        description: "Identificador único da moeda (ex: bitcoin)."
+        tests:
+          - unique
+          - not_null
+      - name: preco_atual
+        description: "Preço da moeda no momento da extração."
+        tests:
+          - not_null
