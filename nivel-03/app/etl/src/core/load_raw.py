@@ -2,7 +2,7 @@ import datetime
 from sqlalchemy import text, inspect
 from datetime import datetime, timedelta
 
-def load_staging_incremental(df, table_name, date_column, engine):
+def load_raw_incremental(df, table_name, date_column, engine):
     """
     Faz a carga incremental: se a tabela existe, deleta os últimos 
     60 dias e insere os novos para evitar duplicados e atualizar dados.
@@ -43,7 +43,7 @@ def load_staging_incremental(df, table_name, date_column, engine):
             
         print(f"✅ Incremental concluído: {len(df_incremental)} registros atualizados.")
 
-def load_staging(df, table_name, engine):
+def load_raw(df, table_name, engine):
     """
     Carga simples via Append: cria a tabela se não existir 
     ou apenas adiciona os novos dados ao final da tabela.

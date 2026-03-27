@@ -2,11 +2,11 @@ import os
 import glob
 import pandas as pd
 from src.core.db import get_engine
-from src.core.config import RAW_DIR, STAGING_DIR
-from src.core.load_staging import load_staging_incremental
+from src.core.config import LANDING_DIR, RAW_DIR
+from src.core.load_raw import load_raw_incremental
 
 RENAME = {
-    "stg_product": {
+    "raw_product": {
         "productid": "id_produto",
         "name": "nome_produto",
         "productnumber": "codigo_produto",
@@ -33,7 +33,7 @@ RENAME = {
         "rowguid": "guid_linha",
         "modifieddate": "data_modificacao"
     },
-    "stg_salesorderdetail": {
+    "raw_salesorderdetail": {
         "salesorderid": "id_pedido",
         "salesorderdetailid": "id_detalhe_pedido",
         "carriertrackingnumber": "numero_rastreio",
@@ -46,7 +46,7 @@ RENAME = {
         "rowguid": "guid_linha",
         "modifieddate": "data_modificacao"
     },
-    "stg_salesorderheader": {
+    "raw_salesorderheader": {
         "salesorderid": "id_pedido",
         "revisionnumber": "numero_revisao",
         "orderdate": "data_pedido",
@@ -82,22 +82,22 @@ MAPPING_DATA = {
     'Product': 'modifieddate'
 }
 
-def process_sales_csv():
+def process_sales_csv_to_raw():
     """
-    Lê CSVs da pasta raw, transforma os dados e carrega no Postgres via Staging Incremental.
+    Lê CSVs da pasta landing, transforma os dados e carrega no Postgres via Staging Incremental.
     """
     engine = get_engine()
     
-    files = glob.glob(os.path.join(RAW_DIR, '*.csv'))
+    files = glob.glob(os.path.join(LANDING_DIR, '*.csv'))
     
     if not files:
-        print("Nenhum arquivo CSV encontrado em data/raw")
+        print("Nenhum arquivo CSV encontrado em data/landing")
         return
 
     for path in files:
         base_name = os.path.basename(path).replace('.csv', '')
         column_data = MAPPING_DATA.get(base_name, 'modifieddate').lower()
-        table_name = f"stg_{base_name.lower()}"
+        table_name = f"raw_{base_name.lower()}"
 
         df = pd.read_csv(path, sep=None, engine='python')
 
@@ -118,9 +118,9 @@ def process_sales_csv():
             
         # 4. SALVAR PARQUET
         file_name = f"{table_name}.parquet"
-        parquet_path = os.path.join(STAGING_DIR, file_name)
+        parquet_path = os.path.join(RAW_DIR, file_name)
         df.to_parquet(parquet_path, index=False)
         print(f"Parquet atualizado: {parquet_path} ({len(df)} linhas)")
 
         # 6. CARREGAR NO POSTGRES
-        load_staging_incremental(df, table_name, column_end_date, engine)
+        load_raw_incremental(df, table_name, column_end_date, engine)

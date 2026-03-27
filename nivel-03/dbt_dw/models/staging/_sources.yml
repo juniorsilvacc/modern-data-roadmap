@@ -1,11 +1,11 @@
 version: 2
 
 sources:
-  - name: raw_data
+  - name: dbt_dw
     database: "modern-data-etl-db-nv3"
     schema: public
     tables:
-      - name: stg_cryto
-      - name: stg_prduct
-      - name: stg_salesorderdetail
-      - name: stg_salesorderheader
+      - name: raw_cryto
+      - name: raw_product
+      - name: raw_salesorderdetail
+      - name: raw_salesorderheader
