@@ -5,7 +5,7 @@ sources:
     database: "modern-data-etl-db-nv3"
     schema: public
     tables:
-      - name: raw_cryto
+      - name: raw_crypto
       - name: raw_product
       - name: raw_salesorderdetail
       - name: raw_salesorderheader
