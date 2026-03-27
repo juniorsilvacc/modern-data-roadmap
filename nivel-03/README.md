@@ -69,6 +69,8 @@ sudo chmod -R 777 data/ logs/ dags/
     - http://localhost:3000 (Grafana - Monitoramento)
 - Use o login `admin` e senha `admin` para entrar no dashboard do Airflow e Grafana.
 
+---
+
 ## 🏗️ Guia de Execução: dbt Analytics Engineering
 
 ### 1️⃣ Preparação do Ambiente (Local/WSL)
@@ -92,6 +94,8 @@ Sempre rode o `debug` para garantir que o dbt está enxergando o Postgres atrav�
 dbt debug --profiles-dir .
 ```
 
+---
+
 ## ⚙️ Comandos Principais de Modelagem
 
 | Comandos             | Descrição                                                       |
@@ -103,8 +107,10 @@ dbt debug --profiles-dir .
 | `dbt docs generate`  | Gera a documentação e a linhagem dos dados.                     |
 | `dbt docs serve`     | Abre o portal de documentação no navegador.                     |
 
+---
+
 ## 📂 Estrutura de Camadas (Medallion)
 Para manter a Governança que discutimos, organize seus modelos assim:
-1.`models/staging/`: Camada Bronze. Apenas limpeza básica (renomear colunas, cast de tipos).
-2.`models/intermediate/`: Camada Silver. Joins complexos e regras de negócio entre tabelas.
-3.`models/marts/`: Camada Gold. Tabelas agregadas prontas para o Dashboard (ex: `fct_vendas_crypto`).
+- `models/staging/`: Camada Bronze. Apenas limpeza básica (renomear colunas, cast de tipos).
+- `models/intermediate/`: Camada Silver. Joins complexos e regras de negócio entre tabelas.
+- `models/marts/`: Camada Gold. Tabelas agregadas prontas para o Dashboard (ex: `fct_vendas_crypto`).

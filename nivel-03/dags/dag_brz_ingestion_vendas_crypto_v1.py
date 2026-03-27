@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from src.extract.file_sales import process_sales_csv
 from src.extract.api_crypto import extract_crypto_to_staging
 
-dados_brutos_prontos = Dataset("postgres://public/stg_all")
+raw_ready_data = Dataset("postgres://public/stg_all")
 
 # 2. CONFIGURAÇÕES PADRÃO
 default_args = {
@@ -37,7 +37,7 @@ with DAG(
     task_crypto = PythonOperator(
         task_id='extrair_api_crypto',
         python_callable=extract_crypto_to_staging,
-        outlets=[dados_brutos_prontos]
+        outlets=[raw_ready_data]
     )
 
     # 4. DEFINIÇÃO DO FLUXO (DEPENDÊNCIAS)
