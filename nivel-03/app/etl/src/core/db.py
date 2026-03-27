@@ -1,34 +1,36 @@
 import os
 import time
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
 from sqlalchemy import text
-
-load_dotenv()
 
 def get_engine():
     """
     Cria a conexão com o banco e tenta reconectar até 5 vezes 
     caso o banco ainda esteja inicializando.
     """
-    db_password = os.getenv("DB_PASS") or os.getenv("DB_PASSWORD")
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+    host = os.getenv("DB_HOST", "postgres")
+    port = os.getenv("DB_PORT", "5432")
+    database = os.getenv("DB_NAME")
     
+    if not password:
+        raise ValueError("A variável DB_PASS está vazia! Verifique o .env e o Docker Compose.")
+
     url = URL.create(
         drivername="postgresql+psycopg2",
-        username=os.getenv("DB_USER"),
-        password=db_password,
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        database=os.getenv("DB_NAME")
+        username=user,
+        password=password,
+        host=host,
+        port=int(port),
+        database=database
     )
     
     engine = create_engine(url)
     
     max_retries = 5
     retry_interval = 5
-
-    print(f"Tentando conectar ao banco em {os.getenv('DB_HOST')}...")
 
     for i in range(max_retries):
         try:

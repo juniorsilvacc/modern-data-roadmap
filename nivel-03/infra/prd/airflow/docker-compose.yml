@@ -58,12 +58,15 @@ services:
       #_PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
       _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary dbt-postgres astronomer-cosmos"
       TZ: UTC
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASS} 
-      DB_PASS: ${DB_PASS}  
-      DB_NAME: ${DB_NAME}
+      DB_USER:
+      DB_PASSWORD:
+      DB_PASS: 
+      DB_NAME:
       DB_HOST: postgres
       DB_PORT: 5432
+      DBT_LOG_PATH: /tmp/dbt/logs
+      DBT_TARGET_PATH: /tmp/dbt/target
+      DBT_PACKAGES_DIR: /tmp/dbt/dbt_packages
     volumes:
       - ${PWD}/../../../dbt_dw:/opt/airflow/dbt_dw
       - ${PWD}/../../../dags:/opt/airflow/dags
@@ -71,7 +74,7 @@ services:
       - ${PWD}/../../../plugins:/opt/airflow/plugins
       - ${PWD}/../../../app:/opt/airflow/app
       - ${PWD}/../../../data:/opt/airflow/data
-      - ${PWD}/../../../dbt:/opt/airflow/dbt
+      #- ${PWD}/../../../dbt:/opt/airflow/dbt
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8080:8080"
@@ -108,12 +111,15 @@ services:
       #_PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary"
       _PIP_ADDITIONAL_REQUIREMENTS: "python-dotenv pandas sqlalchemy mysqlclient requests psycopg2-binary dbt-postgres astronomer-cosmos"
       TZ: UTC
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASS} 
-      DB_PASS: ${DB_PASS}  
-      DB_NAME: ${DB_NAME}
+      DB_USER:
+      DB_PASSWORD:
+      DB_PASS: 
+      DB_NAME:
       DB_HOST: postgres
       DB_PORT: 5432
+      DBT_LOG_PATH: /tmp/dbt/logs
+      DBT_TARGET_PATH: /tmp/dbt/target
+      DBT_PACKAGES_DIR: /tmp/dbt/dbt_packages
     volumes:
       - ${PWD}/../../../dbt_dw:/opt/airflow/dbt_dw
       - ${PWD}/../../../dags:/opt/airflow/dags
@@ -121,7 +127,7 @@ services:
       - ${PWD}/../../../plugins:/opt/airflow/plugins
       - ${PWD}/../../../app:/opt/airflow/app
       - ${PWD}/../../../data:/opt/airflow/data
-      - ${PWD}/../../../dbt:/opt/airflow/dbt
+      #- ${PWD}/../../../dbt:/opt/airflow/dbt
       - /var/run/docker.sock:/var/run/docker.sock
     command: scheduler
     deploy:
