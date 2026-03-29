@@ -3,60 +3,118 @@ version: 2
 models:
   # --- DATA MART EFICIENCIA LOGISTICA ---
   - name: dm_eficiencia_logistica
-    description: "Analisa o Lead Time de entrega e identifica gargalos operacionais e atrasos por território."
+    description: "Data Mart focado em Supply Chain. Analisa o Lead Time de entrega e identifica gargalos e atrasos por território."
     columns:
       - name: id_pedido
-        tests:
-          - not_null
+        description: "Identificador único do pedido (PK)."
+        tests: [not_null]
+      - name: id_territorio
+        description: "Chave do território de venda para análise geográfica de logística (AdventureWorks TerritoryID)."
+      - name: data_pedido
+        description: "Data em que o cliente realizou a compra no sistema."
+      - name: data_envio
+        description: "Data real em que o produto saiu do centro de distribuição (ShipDate)."
       - name: dias_para_envio
-        description: "Diferença entre a data do pedido e a data de envio real."
+        description: "Lead Time: Quantidade de dias decorridos entre o pedido e o envio real."
       - name: flg_pedido_atrasado
-        description: "Indica se o envio ocorreu após a data de vencimento (due date)."
+        description: "Flag Booleana: True se a data de envio ultrapassou a data de vencimento (Due Date)."
+      - name: valor_liquido_item
+        description: "Valor financeiro líquido do item (usado para medir o impacto financeiro de pedidos atrasados)."
+      - name: quantidade_pedido
+        description: "Quantidade física de itens vendidos neste pedido."
 
   # --- DATA MART PERFORMANCE MERCADO VENDAS ---
   - name: dm_performance_mercado_vendas
-    description: "Modelo de correlação avançada entre o faturamento interno e a volatilidade do mercado de criptomoedas."
+    description: "Modelo analítico de correlação. Cruza o faturamento diário da empresa com o índice médio de volatilidade do mercado cripto."
     columns:
       - name: data_referencia
-        tests:
-          - not_null
-          - unique
+        description: "Chave temporal única para o grão diário."
+        tests: [not_null, unique]
+      - name: nome_mes
+        description: "Nome do mês para agrupamento em dashboards (ex: March)."
+      - name: ano
+        description: "Ano civil da referência."
+      - name: is_weekend
+        description: "Informa se o dia de venda caiu em um final de semana."
+      - name: total_pedidos
+        description: "Volume de pedidos distintos realizados no dia."
       - name: faturamento_vendas
-        description: "Soma do faturamento líquido diário."
-      - name: volatilidade_crypto
-        description: "Amplitude percentual diária da moeda selecionada."
+        description: "Soma do faturamento líquido total (Receita Diária)."
+      - name: preco_medio_mercado
+        description: "Preço médio ponderado de todas as moedas observadas no dia (Market Index)."
+      - name: volatilidade_media_mercado
+        description: "Média da amplitude de variação (high-low) das moedas no dia."
+      - name: drawdown_medio_mercado
+        description: "Média de distância do topo histórico das moedas (Métrica de Bear Market)."
+      - name: qtd_moedas_observadas
+        description: "Quantidade de ativos cripto que compuseram o índice médio do dia."
 
   # --- DATA MART PERFORMANCE PRODUTO CATEGORIA ---
   - name: dm_performance_produto_categoria
-    description: "Ranking de performance por produto, analisando volume de vendas e eficiência da política de descontos."
+    description: "Data Mart de Produto. Focado em identificar os itens mais lucrativos e a eficiência dos descontos."
     columns:
       - name: id_produto
-        tests:
-          - not_null
-          - unique
+        description: "Identificador único do produto (PK)."
+        tests: [not_null, unique]
+      - name: nome_produto
+        description: "Nome comercial completo do item."
+      - name: cor_produto
+        description: "Atributo de cor para análise de preferência de estoque."
+      - name: qtd_total_vendida
+        description: "Volume físico total de unidades vendidas do produto."
+      - name: faturamento_total
+        description: "Receita líquida total gerada pelo produto (Fato principal)."
+      - name: total_descontos_concedidos
+        description: "Soma monetária de todos os descontos aplicados ao produto (Impacto na margem)."
       - name: pct_avg_desconto
-        description: "Percentual médio de desconto aplicado sobre o valor bruto."
+        description: "Margem média de desconto aplicada sobre o valor bruto (Efficiency Metric)."
 
   # --- DATA MART SAÚDE CLIENTE ---
   - name: dm_saude_cliente
-    description: "Mart de CRM para gestão de Churn e análise de LTV (Lifetime Value) dos clientes."
+    description: "Mart de CRM. Segmenta clientes por comportamento de compra e risco de Churn."
     columns:
       - name: id_cliente
-        tests:
-          - not_null
-          - unique
-      - name: status_saude_cliente
-        description: "Classificação baseada na recência: Ativo (<=30 dias), Alerta (<=90 dias) ou Churn (>90 dias)."
+        description: "Chave única do cliente (PK)."
+        tests: [not_null, unique]
+      - name: categoria_fidelidade
+        description: "Segmentação baseada no LTV histórico (VIP, Regular, Bronze)."
+      - name: frequencia_compras
+        description: "Total de pedidos realizados pelo cliente na história da empresa."
+      - name: ltv_atual
+        description: "Lifetime Value: Valor total gasto pelo cliente até o momento."
+      - name: ticket_medio
+        description: "Média de gasto do cliente por pedido (LTV / Frequência)."
+      - name: data_ultima_compra
+        description: "Data em que o cliente realizou seu último pedido registrado."
       - name: dias_de_inatividade
-        description: "Quantidade de dias desde a última compra até a data atual do snapshot (2026-03-29)."
+        description: "Recência: Dias sem comprar considerando o snapshot de 29/03/2026."
+      - name: status_saude_cliente
+        description: "Status de retenção: Ativo, Em Alerta ou Churn."
 
   # --- DATA MART VENDAS DETALHADO ---
   - name: dm_vendas_detalhada
-    description: "Tabela Larga (One Big Table - OBT) que desnormaliza o Core para facilitar o consumo direto por ferramentas de BI sem necessidade de JOINs."
+    description: "One Big Table (OBT). Desnormalização total para consumo direto em BI."
     columns:
       - name: id_detalhe_pedido
-        tests:
-          - not_null
-          - unique
+        description: "Identificador único da linha da transação (PK)."
+        tests: [not_null, unique]
+      - name: id_pedido
+        description: "Número do pedido de venda."
+      - name: quantidade_pedido
+        description: "Qtd de itens vendidos nesta linha."
       - name: valor_liquido_item
-        description: "Valor final da transação após descontos."
+        description: "Receita líquida da linha após descontos."
+      - name: nome_produto
+        description: "Atributo descritivo do produto."
+      - name: cor_produto
+        description: "Atributo de cor do produto."
+      - name: categoria_fidelidade
+        description: "Segmentação de fidelidade do cliente no momento da análise."
+      - name: ltv_cliente
+        description: "Valor histórico total gasto por este cliente."
+      - name: nome_mes
+        description: "Mês da venda (Atributo de tempo)."
+      - name: ano
+        description: "Ano da venda (Atributo de tempo)."
+      - name: is_weekend
+        description: "Identifica se a venda ocorreu no final de semana."

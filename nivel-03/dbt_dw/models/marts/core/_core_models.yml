@@ -3,66 +3,104 @@ version: 2
 models:
   # --- DIM CALENDÁRIO --- 
   - name: dim_calendario
-    description: "Dimensão de tempo baseada nas datas de venda do AdventureWorks, ajustada para o período de 2026."
+    description: "Dimensão de tempo (Calendar) que permite análises de sazonalidade e agrupamentos temporais."
     columns:
       - name: data_pk
-        description: "Chave primária da data (formato YYYY-MM-DD)."
-        tests:
-          - unique
-          - not_null
+        description: "Chave primária da data no formato YYYY-MM-DD."
+        tests: [unique, not_null]
+      - name: ano
+        description: "Ano civil extraído da data."
+      - name: trimestre
+        description: "Trimestre do ano (1 a 4)."
+      - name: mes
+        description: "Número do mês (1 a 12)."
+      - name: nome_mes
+        description: "Nome do mês por extenso (ex: March)."
+      - name: dia
+        description: "Dia do mês."
+      - name: dia_da_semana_num
+        description: "Representação numérica do dia da semana (0-Dom a 6-Sab)."
+      - name: is_weekend
+        description: "Flag booleana: true para finais de semana, false para dias úteis."
 
   # --- DIM CLIENTES ---
   - name: dim_clientes
-    description: "Dimensão de clientes contendo métricas de performance histórica e segmentação de fidelidade (VIP, Regular, Bronze)."
+    description: "Dimensão de clientes enriquecida com métricas de histórico de compra (LTV) e segmentação."
     columns:
       - name: id_cliente
-        description: "PK - Identificador único do cliente."
-        tests:
-          - unique
-          - not_null
+        description: "Identificador único do cliente."
+        tests: [unique, not_null]
+      - name: data_primeira_compra
+        description: "Data da primeira transação realizada pelo cliente na plataforma."
+      - name: data_ultima_compra
+        description: "Data da compra mais recente (usada para cálculo de recência)."
+      - name: total_pedidos
+        description: "Quantidade total de pedidos distintos realizados pelo cliente."
+      - name: ltv_cliente
+        description: "Lifetime Value: Soma total do valor líquido gasto pelo cliente."
+      - name: ticket_medio_valor
+        description: "Valor médio gasto por pedido (LTV / Total Pedidos)."
       - name: categoria_fidelidade
-        description: "Classificação baseada no LTV: VIP (>5000), Regular (>1000), Bronze (restante)."
+        description: "Segmentação de fidelidade: VIP (>5000), Regular (>1000) ou Bronze."
 
   # --- DIM PRODUTOS ---
   - name: dim_produtos
-    description: "Dimensão de produtos contendo atributos como nome, código e cor."
+    description: "Dimensão que contém os atributos técnicos e comerciais dos produtos vendidos."
     columns:
       - name: id_produto
-        description: "PK - Identificador único do produto."
-        tests:
-          - unique
-          - not_null
+        description: "Identificador único do produto."
+        tests: [unique, not_null]
+      - name: nome_produto
+        description: "Nome comercial completo do item."
+      - name: codigo_produto
+        description: "Código SKU (Stock Keeping Unit) do produto."
+      - name: cor_produto
+        description: "Cor do produto para análise de mix de vendas."
+      - name: data_modificacao
+        description: "Data da última atualização cadastral do produto no sistema de origem."
 
   # --- FCT VENDAS ---
   - name: fct_vendas
-    description: "Tabela Fato central contendo o detalhe de cada item vendido. É o grão mais baixo da transação."
+    description: "Tabela fato que registra cada item de venda. Grão: Item por Pedido."
     columns:
       - name: id_detalhe_pedido
-        description: "PK - Identificador da linha do detalhe do pedido."
-        tests:
-          - unique
-          - not_null
-
-      - name: data_venda_fk
-        description: "FK para dim_calendario. Garante que toda venda possui uma data válida."
-        tests:
-          - not_null
-          - relationships:
-              to: ref('dim_calendario')
-              field: data_pk
-
+        description: "PK - Identificador único da linha do item no pedido."
+        tests: [unique, not_null]
+      - name: id_pedido
+        description: "Identificador do pedido (Header)."
+        tests: [not_null]
       - name: id_produto
-        description: "FK para dim_produtos."
+        description: "FK - Referência ao produto vendido."
         tests:
           - not_null
-          - relationships:
-              to: ref('dim_produtos')
-              field: id_produto
-
+          - relationships: {to: ref('dim_produtos'), field: id_produto}
       - name: id_cliente
-        description: "FK para dim_clientes."
+        description: "FK - Referência ao cliente que realizou a compra."
         tests:
           - not_null
-          - relationships:
-              to: ref('dim_clientes')
-              field: id_cliente
+          - relationships: {to: ref('dim_clientes'), field: id_cliente}
+      - name: data_venda_fk
+        description: "FK - Data da venda vinculada à dim_calendario."
+        tests:
+          - not_null
+          - relationships: {to: ref('dim_calendario'), field: data_pk}
+      
+      # Métricas (Fatos)
+      - name: quantidade_pedido
+        description: "Quantidade física de itens vendidos na linha."
+      - name: preco_unitario
+        description: "Preço de tabela do produto por unidade."
+      - name: desconto_unitario
+        description: "Percentual de desconto aplicado por unidade (ex: 0.05 para 5%)."
+      - name: valor_bruto_item
+        description: "Valor total sem descontos (Quantidade * Preço Unitário)."
+      - name: valor_desconto_item
+        description: "Valor monetário do desconto concedido na linha."
+      - name: valor_liquido_item
+        description: "Valor final da venda após descontos (Base para cálculo de receita)."
+      
+      # Contexto (Degenerate Dimensions)
+      - name: status_pedido
+        description: "Status atual do pedido (ex: 5 = Finalizado)."
+      - name: flg_pedido_online
+        description: "Indica se a venda foi originada no e-commerce (true) ou venda direta (false)."
