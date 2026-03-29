@@ -1,14 +1,114 @@
 # 🛠️ Modern Data Pipeline: ELT (Nível 03)
+Nesta etapa, evolui de scripts simples para uma arquitetura robusta de Analytics Engineering, integrando ingestão via Python, orquestração com Airflow e modelagem dimensional com dbt.
 
 ---
 
 ## 🏗️ Arquitetura do Projeto
+O pipeline foi desenhado para ser resiliente e escalável, utilizando containers Docker para isolar cada componente da stack.
 
 <img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/arquitetura-nv3.png" />
 
 ---
 
-## 🚀Diferenciais Estratégicos
+## 🧱 Demonstração da Linhagem (Lineage)
+A rastreabilidade dos dados é garantida pelo dbt, permitindo visualizar desde as fontes (sources) até os data marts finais.
+
+<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/Lineage-Graph.png" />
+
+--- 
+
+## 🛠️ Stack Tecnológica
+- Linguagens: **Python (Ingestão OOP) e SQL (Transformação)**
+- Transformação: **dbt Core**
+- Banco de Dados: **PostgreSQL (Data Warehouse)**
+- Orquestração: **Apache Airflow**
+- Infraestrutura: **Docker & Docker Compose**
+- Monitoramento: **Grafana & Prometheus**
+- Qualidade de Dados: **dbt Tests (46 testes automatizados)**
+
+---
+
+## 💎 Diferenciais de Engenharia de Dados
+Diferente de pipelines convencionais, este projeto aplica boas práticas de desenvolvimento de software:
+- **Idempotência:** Scripts de ingestão e modelos dbt desenhados para serem reexecutados sem duplicidade ou corrupção de dados.
+- **Orientação a Objetos (OOP):** Drivers de extração em Python modularizados, facilitando a manutenção de APIs (NASA e Mercado Livre).
+- **Tratamento de Arquivos:** Uso de formato Parquet na camada de Landing para otimização de storage e performance de leitura.
+- **Data Quality Gate:** Implementação de testes de unicidade, integridade referencial e regras de negócio singulares (ex: lead time negativo).
+
+---
+
+## 📐 Modelagem de Dados (Medallion Architecture)
+O projeto segue a separação lógica em camadas para garantir escalabilidade e governança:
+- **Staging (Bronze):** Limpeza inicial, renomeação de colunas e tipagem.
+- **Intermediate (Silver):** Camada de transformação onde aplicamos regras de negócio complexas, como o cálculo de volatilidade cripto e métricas de performance de clientes.
+- **Core (Gold/Star Schema):** Modelagem dimensional com tabelas Fato (`fct_vendas`) e Dimensões (`dim_produtos, dim_clientes, dim_calendario`).
+- **Analytics (Marts):** Tabelas prontas para consumo (OBT e Agregações) focadas em Logística, CRM, Finanças e Correlação de Mercado.
+
+---
+
+## 📂 Estrutura de Camadas (Medallion)
+Para manter a Governança que discutimos, organize seus modelos assim:
+- `models/staging/`: Camada Bronze. Apenas limpeza básica (renomear colunas, cast de tipos).
+- `models/intermediate/`: Camada Silver. Joins complexos e regras de negócio entre tabelas.
+- `models/marts/`: Camada Gold. Tabelas agregadas prontas para o Dashboard (ex: `fct_vendas_crypto`).
+
+---
+
+## 💡 Business Insights (Data Marts)
+O diferencial deste DW é a entrega de dashboards prontos para responder:
+- **Eficiência Logística:** Cálculo de Lead Time e identificação de gargalos por território.
+- **Correlação Cripto:** Análise de como o faturamento da empresa se comporta em relação à volatilidade do mercado de criptomoedas.
+- **Saúde do Cliente (CRM):** Segmentação de clientes por LTV e identificação automática de Churn baseado em dias de inatividade.
+- **Performance de Produto:** Ranking de lucratividade e análise de agressividade de descontos.
+
+---
+
+## 🛡️ Qualidade e Governança
+O projeto conta com 46 testes automatizados que garantem:
+- Unicidade e não-nulidade de chaves primárias.
+- Integridade referencial (Relationships) entre Fatos e Dimensões.
+- Documentação completa de colunas e métricas acessível via dbt Docs.
+
+---
+
+## 📈 Perguntas de Negócio Respondidas
+Com a implementação deste Data Warehouse, a empresa agora consegue responder:
+- Eficiência Logística (`dm_eficiencia_logistica`)
+    - Qual é o nosso Lead Time médio (tempo entre pedido e envio) por território?
+    - Qual a porcentagem de pedidos que estão saindo com atraso em relação à data de vencimento?
+    - Existe algum território específico onde a logística está sobrecarregada e gerando mais atrasos?
+    - Qual o impacto financeiro (valor em risco) dos pedidos que estão atualmente atrasados?
+
+- Performance de Mercado e Cripto (`dm_performance_mercado_vendas`)
+    - Existe correlação entre a volatilidade do mercado de criptomoedas e o volume de vendas da nossa loja?
+    - O faturamento da empresa cai quando o mercado cripto está em Drawdown (queda acentuada)?
+    - Como o nosso faturamento se comporta em dias de alta volatilidade financeira externa?
+    - O ticket médio das vendas muda de acordo com o "humor" do mercado de ativos digitais?
+
+- Performance de Produto e Desconto (`dm_performance_produto_categoria`)
+    - Quais são os Top 10 produtos em faturamento e em volume de vendas?
+    - Estamos sendo agressivos demais nos descontos? Qual o percentual médio de desconto por produto?
+    - Produtos com maior desconto realmente vendem mais volume, ou estamos apenas sacrificando margem?
+    - Quais produtos possuem alto faturamento, mas baixo volume (produtos de alto valor agregado)?
+
+- Saúde e Retenção de Clientes (`dm_saude_cliente`)
+    - Quantos clientes estão em risco de Churn (sem comprar há mais de 90 dias)?
+    - Qual é o LTV (Lifetime Value) médio dos nossos clientes VIPs versus clientes Bronze?
+    - Qual a nossa taxa de retenção? Quantos clientes estão "Ativos" no último mês?
+    - Qual o ticket médio de um cliente fiel comparado a um cliente novo?
+
+- Visão 360º de Vendas (`dm_vendas_detalhada`)
+    - Como as vendas se comportam nos finais de semana em comparação aos dias úteis?
+    - Qual a sazonalidade mensal das vendas por categoria de produto?
+    - Qual perfil de cliente (VIP/Regular) prefere comprar determinadas cores de produtos?
+    - Qual o faturamento detalhado por mês, ano e perfil de fidelidade em uma única visão?
+
+---
+
+## 🖥️ Monitoramento Grafana
+<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/Monitoramento-Grafana.png" />
+
+---
 
 ## 🏗️ Guia de Execução - Modern Data Roadmap (Nível 03)
 Siga esta **`ordem rigorosa`** para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
@@ -109,8 +209,5 @@ dbt debug --profiles-dir .
 
 ---
 
-## 📂 Estrutura de Camadas (Medallion)
-Para manter a Governança que discutimos, organize seus modelos assim:
-- `models/staging/`: Camada Bronze. Apenas limpeza básica (renomear colunas, cast de tipos).
-- `models/intermediate/`: Camada Silver. Joins complexos e regras de negócio entre tabelas.
-- `models/marts/`: Camada Gold. Tabelas agregadas prontas para o Dashboard (ex: `fct_vendas_crypto`).
+### 👷 Autor
+[Linkedin](https://www.linkedin.com/in/juniiorsilvadev/) 
