@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  # --- TABELA DE PRODUTOS ---
+  # --- PRODUTOS ---
   - name: stg_product
     description: "Tabela dimensional de produtos limpa e padronizada."
     columns:

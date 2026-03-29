@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  # --- DIM CALENDÁRIO --- 
+  - name: dim_calendario
+    description: "Dimensão de tempo baseada nas datas de venda do AdventureWorks, ajustada para o período de 2026."
+    columns:
+      - name: data_pk
+        description: "Chave primária da data (formato YYYY-MM-DD)."
+        tests:
+          - unique
+          - not_null
+
+  # --- DIM CLIENTES ---
+  - name: dim_clientes
+    description: "Dimensão de clientes contendo métricas de performance histórica e segmentação de fidelidade (VIP, Regular, Bronze)."
+    columns:
+      - name: id_cliente
+        description: "PK - Identificador único do cliente."
+        tests:
+          - unique
+          - not_null
+      - name: categoria_fidelidade
+        description: "Classificação baseada no LTV: VIP (>5000), Regular (>1000), Bronze (restante)."
+
+  # --- DIM PRODUTOS ---
+  - name: dim_produtos
+    description: "Dimensão de produtos contendo atributos como nome, código e cor."
+    columns:
+      - name: id_produto
+        description: "PK - Identificador único do produto."
+        tests:
+          - unique
+          - not_null
+
+  # --- FCT VENDAS ---
+  - name: fct_vendas
+    description: "Tabela Fato central contendo o detalhe de cada item vendido. É o grão mais baixo da transação."
+    columns:
+      - name: id_detalhe_pedido
+        description: "PK - Identificador da linha do detalhe do pedido."
+        tests:
+          - unique
+          - not_null
+
+      - name: data_venda_fk
+        description: "FK para dim_calendario. Garante que toda venda possui uma data válida."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_calendario')
+              field: data_pk
+
+      - name: id_produto
+        description: "FK para dim_produtos."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_produtos')
+              field: id_produto
+
+      - name: id_cliente
+        description: "FK para dim_clientes."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_clientes')
+              field: id_cliente

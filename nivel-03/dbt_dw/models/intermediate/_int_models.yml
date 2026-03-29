@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  # --- CRYPTO ANALISE VOLATILIDADE ---
+  - name: int_crypto__analise_volatilidade
+    description: "Transforma os dados brutos de cripto em métricas de volatilidade diária (Amplitude e Drawdown)."
+    columns:
+      - name: id_crypto
+        description: "Identificador da moeda (ex: bitcoin)."
+        tests:
+          - not_null
+      - name: data_extracao
+        description: "Data em que o snapshot do preço foi capturado pela API."
+      - name: pct_amplitude_diaria
+        description: "Percentual de variação entre a máxima e a mínima do dia."
+      - name: pct_queda_do_topo
+        description: "Percentual de distância do preço atual em relação ao All-Time High (ATH)."
+
+  # --- VENDAS CALENDÁRIO SAZONAL ---
+  - name: int_vendas__calendario_sazonal
+    description: "Geração de dimensões temporais (ano, mês, dia da semana) para análise de sazonalidade."
+    columns:
+      - name: data_referencia
+        description: "Chave primária da data (PK)."
+        tests:
+          - unique
+          - not_null
+      - name: is_weekend
+        description: "Flag booleana para identificar sábados e domingos."
+
+  # --- VENDAS DETALHADAS ---
+  - name: int_vendas__detalhadas
+    description: "Enriquecimento dos itens de venda com informações cadastrais de produtos e cálculos de impostos e líquidos."
+    columns:
+      - name: id_detalhe_pedido
+        description: "Chave única da linha de detalhe."
+        tests:
+          - unique
+          - not_null
+      - name: valor_liquido_item
+        description: "Valor final do item após aplicação de descontos: (Preço * Qtd) * (1 - Desconto)."
+
+  # --- VENDAS AGREGADO POR PEDIDO ---
+  - name: int_vendas__agregado_por_pedido
+    description: "Agrega os itens da int_vendas__detalhadas no grão de Pedido (Header) para métricas de subtotal."
+    columns:
+      - name: id_pedido
+        description: "FK para a stg_salesorderheader."
+        tests:
+          - unique
+          - not_null
+      - name: total_itens
+        description: "Quantidade de SKUs distintos no pedido."
+
+  # --- VENDAS PERFOMANCE CLIENTES ---
+  - name: int_vendas__performance_clientes
+    description: "Calcula o comportamento histórico de cada cliente (LTV e Ticket Médio) antes da classificação final."
+    columns:
+      - name: id_cliente
+        description: "PK do cliente."
+        tests:
+          - unique
+          - not_null
+      - name: valor_total_gasto
+        description: "Soma histórica de todas as compras do cliente (Lifetime Value bruto)."

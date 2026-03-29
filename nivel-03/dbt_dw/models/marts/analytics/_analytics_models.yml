@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  # --- DATA MART EFICIENCIA LOGISTICA ---
+  - name: dm_eficiencia_logistica
+    description: "Analisa o Lead Time de entrega e identifica gargalos operacionais e atrasos por território."
+    columns:
+      - name: id_pedido
+        tests:
+          - not_null
+      - name: dias_para_envio
+        description: "Diferença entre a data do pedido e a data de envio real."
+      - name: flg_pedido_atrasado
+        description: "Indica se o envio ocorreu após a data de vencimento (due date)."
+
+  # --- DATA MART PERFORMANCE MERCADO VENDAS ---
+  - name: dm_performance_mercado_vendas
+    description: "Modelo de correlação avançada entre o faturamento interno e a volatilidade do mercado de criptomoedas."
+    columns:
+      - name: data_referencia
+        tests:
+          - not_null
+          - unique
+      - name: faturamento_vendas
+        description: "Soma do faturamento líquido diário."
+      - name: volatilidade_crypto
+        description: "Amplitude percentual diária da moeda selecionada."
+
+  # --- DATA MART PERFORMANCE PRODUTO CATEGORIA ---
+  - name: dm_performance_produto_categoria
+    description: "Ranking de performance por produto, analisando volume de vendas e eficiência da política de descontos."
+    columns:
+      - name: id_produto
+        tests:
+          - not_null
+          - unique
+      - name: pct_avg_desconto
+        description: "Percentual médio de desconto aplicado sobre o valor bruto."
+
+  # --- DATA MART SAÚDE CLIENTE ---
+  - name: dm_saude_cliente
+    description: "Mart de CRM para gestão de Churn e análise de LTV (Lifetime Value) dos clientes."
+    columns:
+      - name: id_cliente
+        tests:
+          - not_null
+          - unique
+      - name: status_saude_cliente
+        description: "Classificação baseada na recência: Ativo (<=30 dias), Alerta (<=90 dias) ou Churn (>90 dias)."
+      - name: dias_de_inatividade
+        description: "Quantidade de dias desde a última compra até a data atual do snapshot (2026-03-29)."
+
+  # --- DATA MART VENDAS DETALHADO ---
+  - name: dm_vendas_detalhada
+    description: "Tabela Larga (One Big Table - OBT) que desnormaliza o Core para facilitar o consumo direto por ferramentas de BI sem necessidade de JOINs."
+    columns:
+      - name: id_detalhe_pedido
+        tests:
+          - not_null
+          - unique
+      - name: valor_liquido_item
+        description: "Valor final da transação após descontos."
