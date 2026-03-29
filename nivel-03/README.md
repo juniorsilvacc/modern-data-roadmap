@@ -13,7 +13,7 @@ O pipeline foi desenhado para ser resiliente e escalável, utilizando containers
 ## 🧱 Demonstração da Linhagem (Lineage)
 A rastreabilidade dos dados é garantida pelo dbt, permitindo visualizar desde as fontes (sources) até os data marts finais.
 
-<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/Lineage-Graph.png" />
+<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/lineage-graph.png" />
 
 --- 
 
@@ -105,10 +105,13 @@ Com a implementação deste Data Warehouse, a empresa agora consegue responder:
 
 ---
 
-## 🖥️ Monitoramento Grafana
-<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/Monitoramento-Grafana.png" />
+## 🖥️ Monitoramento
+<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/monitoramento-grafana.png" />
 
 ---
+
+## 🔄 Orquestração
+<img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/pipeline-dag-airflow.png" />
 
 ## 🏗️ Guia de Execução - Modern Data Roadmap (Nível 03)
 Siga esta **`ordem rigorosa`** para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
