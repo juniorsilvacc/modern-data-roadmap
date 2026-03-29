@@ -33,11 +33,11 @@ renamed as (
         valor_frete::numeric(18,4) as valor_frete,
         valor_total::numeric(18,4) as valor_total,
 
-        -- Datas
-        data_pedido::timestamp as data_pedido,
-        data_vencimento::timestamp as data_vencimento,
-        data_envio::timestamp as data_envio,
-        data_modificacao::timestamp as data_modificacao,
+        -- DATAS ATUALIZADAS (Shift de 12 anos para bater com a Cripto)
+        (data_pedido::timestamp + interval '11 years 9 months') as data_pedido,
+        (data_vencimento::timestamp + interval '11 years 9 months') as data_vencimento,
+        (data_envio::timestamp + interval '11 years 9 months') as data_envio,
+        (data_modificacao::timestamp + interval '11 years 9 months') as data_modificacao,
         
         -- Auditoria e Comentários
         guid_linha,

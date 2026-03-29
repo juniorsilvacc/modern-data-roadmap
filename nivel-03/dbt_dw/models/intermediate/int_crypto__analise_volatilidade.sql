@@ -10,6 +10,8 @@ volatilidade as (
         maxima_24h,
         minima_24h,
 
+        data_extracao,
+
         -- Métrica: Amplitude de variação no dia
         (maxima_24h - minima_24h) / nullif(minima_24h, 0) * 100 as pct_amplitude_diaria,
         
