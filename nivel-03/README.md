@@ -113,6 +113,8 @@ Com a implementação deste Data Warehouse, a empresa agora consegue responder:
 ## 🔄 Orquestração
 <img width="1750" height="874" alt="Image" src="https://github.com/juniorsilvacc/modern-data-roadmap/blob/master/nivel-03/pipeline-dag-airflow.png" />
 
+---
+
 ## 🏗️ Guia de Execução - Modern Data Roadmap (Nível 03)
 Siga esta **`ordem rigorosa`** para garantir que a rede e as dependências de banco de dados estejam prontas antes do orquestrador iniciar.
 
